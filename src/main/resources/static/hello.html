@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Demo</title>
+<!--    <script src="/webjars/jquery/3.6.0/jquery.min.js"></script>-->
+<!--    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>-->
+    <script>
+        //连接WebSocket
+        const socket = new WebSocket('ws://localhost:8080/queueUp');
+        // const client = Stomp.over(socket);
+        // client.connect({}, function (frame) {
+        //     console.log('Connected: ' + frame);
+        // });
+
+        //发送加入排队信息
+        function join() {
+            let name = $('#name').val();
+            let phone = $('#phone').val();
+            if (name === '' || phone === '') {
+                alert('请输入姓名和电话号码!');
+                return;
+            }
+            let user = {'name': name, 'phone': phone};
+            client.send('/app/join', {}, JSON.stringify(user));
+            $('#name').val('');
+            $('#phone').val('');
+        }
+
+        //接收等待队列信息
+        // client.subscribe('/queue/wait', function (response) {
+        //     let userList = JSON.parse(response.body);
+        //     let html = '';
+        //     for (let i = 0; i < userList.length; i++) {
+        //         if (i === 0) {
+        //             html += '<tr class="bg-success">';
+        //         } else {
+        //             html += '<tr>';
+        //         }
+        //         html += '<td>' + (i+1) + '</td>';
+        //         html += '<td>' + userList[i].name + '</td>';
+        //         html += '<td>' + userList[i].phone + '</td>';
+        //         html += '</tr>';
+        //     }
+        //     $('#waitTable').html(html);
+        // });
+
+        //点击下一个按钮
+        function next() {
+            client.send('/app/next', {}, '');
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1>排队系统</h1>
+    <hr>
+    <div>
+        <label>姓名：</label>
+        <input type="text" id="name">
+        <label>电话号码：</label>
+        <input type="text" id="phone">
+        <button onclick="join()">加入排队</button>
+    </div>
+    <hr>
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+        <tr>
+            <th>排队号</th>
+            <th>姓名</th>
+            <th>电话号码</th>
+        </tr>
+        </thead>
+        <tbody id="waitTable"></tbody>
+    </table>
+    <button onclick="next()">下一个</button>
+</div>
+</body>
+</html>
